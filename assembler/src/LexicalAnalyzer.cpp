@@ -112,7 +112,7 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
                     state = State::FINISH;
                     break;
                 }
-                token = std::make_pair(std::make_pair(("r" + buffer), line), LexemType::REGISTER);
+                token = std::make_pair(std::make_pair((buffer), line), LexemType::REGISTER);
                 {
                     std::unique_lock<std::mutex> lock(mtx);
                     inputLexems.push(token);

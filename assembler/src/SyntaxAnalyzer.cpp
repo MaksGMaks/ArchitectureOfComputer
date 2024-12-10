@@ -3,7 +3,7 @@
 k_13::SyntaxAnalyzer::SyntaxAnalyzer() {
     code.clear();
     errorMessages.clear();
-    cmd = {LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED};
+    cmd = {LexemType::UNUSED, 0, 0, 0, ""};
     commands.clear();
 }
 
@@ -135,7 +135,7 @@ void k_13::SyntaxAnalyzer::data() {
 }
 
 void k_13::SyntaxAnalyzer::operators() {
-    cmd = {LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED};
+    cmd = {LexemType::UNUSED, 0, 0, 0, ""};
     while (code[position].type != LexemType::DATA && position < code.size()) {
         switch (code[position].type) {
         case LexemType::ADD:
@@ -200,7 +200,7 @@ void k_13::SyntaxAnalyzer::operators() {
             break;
         case LexemType::SEPARATOR:
             position++;
-            cmd = {LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED, LexemType::UNUSED};
+            cmd = {LexemType::UNUSED, 0, 0, 0, ""};
             break;
         case LexemType::IDENTIFIER:
             idn.isData = false;
@@ -224,17 +224,20 @@ void k_13::SyntaxAnalyzer::operators() {
 }
 
 void k_13::SyntaxAnalyzer::r3_type() {
-    cmd.operand1 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+    } else {
+        cmd.operand1 = std::stoi(code[position-1].value);
     }
-    cmd.operand2 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
+    } else {
+        cmd.operand2 = std::stoi(code[position-1].value);
     }
-    cmd.operand3 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+    } else {
+        cmd.operand3 = std::stoi(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
@@ -244,13 +247,15 @@ void k_13::SyntaxAnalyzer::r3_type() {
 }
 
 void k_13::SyntaxAnalyzer::r2_type() {
-    cmd.operand1 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+    } else {
+        cmd.operand1 = std::stoi(code[position-1].value);
     }
-    cmd.operand2 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+    } else {
+        cmd.operand2 = std::stoi(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
@@ -260,9 +265,10 @@ void k_13::SyntaxAnalyzer::r2_type() {
 }
 
 void k_13::SyntaxAnalyzer::r1_type() {
-    cmd.operand1 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+    } else {
+        cmd.operand1 = std::stoi(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
@@ -280,15 +286,17 @@ void k_13::SyntaxAnalyzer::r0_type() {
 }
 
 void k_13::SyntaxAnalyzer::i2_type() {
-    cmd.operand1 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+    } else {
+        cmd.operand1 = std::stoi(code[position-1].value);
     }
-    cmd.operand2 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
+    } else {
+        cmd.operand2 = std::stoi(code[position-1].value);
     }
-    cmd.operand3 = code[position].type;
+    cmd.offset = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
             errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected label/offset. Current value - " + code[position].value);
@@ -304,11 +312,12 @@ void k_13::SyntaxAnalyzer::i2_type() {
 }
 
 void k_13::SyntaxAnalyzer::i1_type() {
-    cmd.operand1 = code[position].type;
     if(!match(LexemType::REGISTER)) {
         errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected register rA");
+    } else {
+        cmd.operand1 = std::stoi(code[position-1].value);
     }
-    cmd.operand3 = code[position].type;
+    cmd.offset = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
             errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected label/offset");
@@ -324,7 +333,7 @@ void k_13::SyntaxAnalyzer::i1_type() {
 }
 
 void k_13::SyntaxAnalyzer::i0_type() {
-    cmd.operand3 = code[position].type;
+    cmd.offset = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
             errorMessages[position].push_back("Syntax error at line " + std::to_string(code[position].line) + ": expected label/offset");
