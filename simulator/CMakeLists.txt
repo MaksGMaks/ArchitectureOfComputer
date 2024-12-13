@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
-project(assembler)
+project(simulator)
 
 set(ALL_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/LexicalAnalyzer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/SyntaxAnalyzer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Generator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryDevice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RegisterDevice.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Processor.cpp
     )
 
 # Create executable
@@ -22,4 +22,4 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 # Set the destination directory for the executable
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/assembler)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/simulator)

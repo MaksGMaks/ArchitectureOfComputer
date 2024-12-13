@@ -11,7 +11,7 @@ const std::vector<k_13::Lexem> k_13::LexicalAnalyzer::getLexems() {
 }
 
 int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
-    if(filename.find(".asm") == filename.length() - 5) {
+    if(filename.find(".asm") != filename.length() - 4) {
         return -1;
     }
     std::ifstream file(filename);
@@ -24,7 +24,7 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
     State state = State::START;
     isEndOfFile = false;
     char ch, nch{};
-    std::string buffer{};
+    std::string buffer{}, rBuffer{};
     std::pair<std::pair<std::string, int>, LexemType> token{};
     int line = 1;
     LexemType type;
@@ -41,8 +41,6 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
         case State::START:
             if (file.eof())
                 state = State::END_OF_FILE;
-            else if(ch == 'r' || ch == 'R')
-                state = State::REGISTER;
             else if(ch == '.')
                 state = State::SPECIALKEYWORD; 
             else if (ch <= 'z' && ch >= 'a' || ch <= 'Z' && ch >= 'A')
@@ -77,42 +75,13 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
             break;
 
         case State::REGISTER:
-            buffer = "";
-            file.get(ch);
-            while (ch <= '9' && ch >= '0' && !file.eof()) {
-                buffer += ch;
-                file.get(ch);
+            rBuffer = "";
+            for(int i = 1; i < buffer.size(); i++) {
+                rBuffer += buffer[i];
             }
-            if (buffer.length() > 3) {
-                token = std::make_pair(std::make_pair(buffer, line), LexemType::UNKNOWN);
-                {
-                    std::unique_lock<std::mutex> lock(mtx);
-                    inputLexems.push(token);
-                    getToken.notify_one();
-                }
-                state = State::FINISH;
-                break;
-            } else if(buffer.length() == 0) {
-                token = std::make_pair(std::make_pair(std::string(1, 'r'), line), LexemType::UNKNOWN);
-                {
-                    std::unique_lock<std::mutex> lock(mtx);
-                    inputLexems.push(token);
-                    getToken.notify_one();
-                }
-                state = State::FINISH;
-                break;
-            } else {
-                if(std::stoi(buffer) > 127) {
-                    token = std::make_pair(std::make_pair(("r" + buffer), line), LexemType::UNKNOWN);
-                    {
-                        std::unique_lock<std::mutex> lock(mtx);
-                        inputLexems.push(token);
-                        getToken.notify_one();
-                    }
-                    state = State::FINISH;
-                    break;
-                }
-                token = std::make_pair(std::make_pair((buffer), line), LexemType::REGISTER);
+            
+            if(std::stoi(rBuffer) > 127) {
+                token = std::make_pair(std::make_pair(("r" + rBuffer), line), LexemType::UNKNOWN);
                 {
                     std::unique_lock<std::mutex> lock(mtx);
                     inputLexems.push(token);
@@ -121,6 +90,13 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
                 state = State::FINISH;
                 break;
             }
+            token = std::make_pair(std::make_pair((rBuffer), line), LexemType::REGISTER);
+            {
+                std::unique_lock<std::mutex> lock(mtx);
+                inputLexems.push(token);
+                getToken.notify_one();
+            }
+            state = State::FINISH;
             break;
         
         case State::SPECIALKEYWORD:
@@ -147,6 +123,15 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
                 buffer += ch;
                 file.get(ch);
             }
+            if(buffer[0] == 'r' || buffer[0] == 'R') {
+                if(buffer.size() < 5 && buffer.size() > 1) {
+                    if(buffer[1] <= '9' && buffer[1] >= '0'){
+                        state = State::REGISTER;
+                        break;
+                    }
+                }
+            }
+            
             token = std::make_pair(std::make_pair(buffer, line), LexemType::UNDEFINED);
             {
                 std::unique_lock<std::mutex> lock(mtx);

@@ -256,7 +256,7 @@ bool k_13::Generator::identifierExist(const std::string &name) {
 
 bool k_13::Generator::findOffset(int64_t &operand, const std::string &name) {
     try{
-        operand = std::stoi(name);
+        operand = std::stoll(name);
     } catch (std::invalid_argument &e) {
         if(identifierExist(name)) {
             operand = identifiers.at(name).memLoc;
@@ -282,6 +282,6 @@ int64_t k_13::Generator::r2_type(const int64_t &opcode, const int64_t &operand1,
 }
 
 int64_t k_13::Generator::r1_type(const int64_t &opcode, const int64_t &operand1) {
-    int op1 = operand1 << 32;
+    int64_t op1 = operand1 << 32;
     return (opcode | op1);
 }

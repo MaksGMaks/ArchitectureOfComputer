@@ -9,10 +9,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_ASM "Build the assemler application." ON)
 option(BUILD_SIM "Build the simulator application." ON)
 
+add_subdirectory(libs/common)
+
 if(BUILD_ASM)
     add_subdirectory(assembler)
 endif()
 
-#if(BUILD_SIM)
-#    add_subdirectory(simulator)
-#endif()
+if(BUILD_SIM)
+    add_subdirectory(simulator)
+endif()
