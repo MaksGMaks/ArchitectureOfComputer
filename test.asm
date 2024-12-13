@@ -1,9 +1,29 @@
 .code
         lw      r1      idn1
-mult:   add     r17     R127    r122
-        SUB     r1      r14     r58
-        AdB     r9      r0      r0
+        lw      r2      idn2 
+        lw      r3      idn3
+        cmpe    r1      r2      r4
+        cmpe    r1      r3      r5
+        bez     r5      bezJM
+        inc     r6
+        inc     r6
+bezJM:  bnz     r4      bnezJM
+        dec     r6
+        dec     r6
+bnezJM: jma     r3      r1      jmaJM
+        inc     r6
+jmaJM:  jmb     r3      r1      jmbJM
+        inc     r6
+jmbJM:  jmae    r1      r1      jmaeJM
+        dec     r6
+jmaeJM: jmbe    r1      r3      jmbeJM
+        inc     r7
+jmbeJM: jmp     end
+        dec     r7
+end:    swp     r7      r1
+        halt
 
 .data
-idn1:   -300
-iDn2:   400
+idn1:   -36028797018963978
+idn2:   10
+idn3:   11

@@ -87,7 +87,7 @@ namespace k_13 {
     struct identifier {
         int memLoc{};
         bool isData{};
-        int value{};
+        int64_t value{};
     };
 
     struct constants_k13
@@ -135,6 +135,50 @@ namespace k_13 {
             {".data", LexemType::DATA},
             {".start", LexemType::START},
             {".code", LexemType::START}
+        };
+
+        std::map<LexemType, std::string> enumToStringLexems = {
+            {LexemType::LOAD, "LOAD"},
+            {LexemType::STORE, "STORE"},
+            {LexemType::LOAD_REG, "LOAD_REG"},
+            {LexemType::SWAP, "SWAP"},
+            {LexemType::ADD, "ADD"},
+            {LexemType::SUB, "SUB"},
+            {LexemType::XADD, "XADD"},
+            {LexemType::XSUB, "XSUB"},
+            {LexemType::MULT, "MULT"},
+            {LexemType::IMULT, "IMULT"},
+            {LexemType::INC, "INC"},
+            {LexemType::DEC, "DEC"},
+            {LexemType::AND, "AND"},
+            {LexemType::OR, "OR"},
+            {LexemType::XOR, "XOR"},
+            {LexemType::NOT, "NOT"},
+            {LexemType::SAL, "SAL"},
+            {LexemType::SAR, "SAR"},
+            {LexemType::CMPEQ, "CMPEQ"},
+            {LexemType::BT, "BT"},
+            {LexemType::ADB, "ADB"},
+            {LexemType::SBB, "SBB"},
+            {LexemType::RCL, "RCL"},
+            {LexemType::RCR, "RCR"},
+            {LexemType::BEZ, "BEZ"},
+            {LexemType::BNZ, "BNZ"},
+            {LexemType::JMA, "JMA"},
+            {LexemType::JMB, "JMB"},
+            {LexemType::JMAE, "JMAE"},
+            {LexemType::JMBE, "JMBE"},
+            {LexemType::JMP, "JMP"},
+            {LexemType::HALT, "HALT"},
+            {LexemType::IDENTIFIER, "IDENTIFIER"},
+            {LexemType::NUMBER, "NUMBER"},
+            {LexemType::REGISTER, "REGISTER"},
+            {LexemType::SEPARATOR, "SEPARATOR"},
+            {LexemType::DATA, "DATA"},
+            {LexemType::START, "START"},
+            {LexemType::COLOMN, "COLOMN"},
+            {LexemType::UNKNOWN, "UNKNOWN"},
+            {LexemType::UNDEFINED, "UNDEFINED"}
         };
     };
 }

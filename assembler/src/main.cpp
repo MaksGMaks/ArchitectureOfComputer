@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         }
         break;
     case -1:
-        std::cout << "Wrong file type. Require .k13\n";
+        std::cout << "Wrong file type. Require .asm\n";
         break;
     case -2:
         std::cout << "Can't reach file with path: " << inpPath << std::endl;

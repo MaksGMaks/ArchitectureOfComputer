@@ -16,7 +16,7 @@ public:
 
     int analyze(const std::vector<Lexem> &lexems);
     std::map<int, command> getCommands() { return commands; }
-    std::map<std::string, identifier> getIdentifiers() { return identifiers; }
+    std::list<std::pair<std::string, identifier>> getIdentifiers() { return identifiers; }
 private:
     int errors = 0;
     int position = 0;
@@ -24,7 +24,7 @@ private:
 
     std::vector<Lexem> code;
     std::map<int, std::vector<std::string>> errorMessages;
-    std::map<std::string, identifier> identifiers;
+    std::list<std::pair<std::string, identifier>> identifiers;
 
     std::map<int, command> commands;
     command cmd;
@@ -44,4 +44,7 @@ private:
     void i0_type();
 
     bool match(const LexemType expectedType);
+
+    const int64_t LOW_NUM = (36028797018963968 * -1);
+    const int64_t HIGH_NUM = 36028797018963967;
 };};
