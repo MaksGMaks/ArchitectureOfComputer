@@ -22,3 +22,11 @@ void MemoryDevice::printMemory() {
         }
     }
 }
+
+void MemoryDevice::printMemoryFile(std::ofstream &outFile) {
+    for(int i = 0; i < 33554432; i++) {
+        if(memory[i] != 0) {
+            outFile << std::dec << "MEM[" << i << "] = " << std::hex << std::setw(14) << std::setfill('0') << (memory[i] & 0x00ffffffffffffff) << " = " << std::dec << memory[i] << std::endl;
+        }
+    }
+}

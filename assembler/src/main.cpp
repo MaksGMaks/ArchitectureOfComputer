@@ -4,10 +4,6 @@
 #include "Generator.hpp"
 #include <filesystem>
 
-void writeLexems(const std::vector<k_13::Lexem> &lexems);
-
-std::string findDistance(const int maxSize, const std::string &lexems);
-
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         std::cerr << "Error: input path to file for compilation" << std::endl;
@@ -35,7 +31,6 @@ int main(int argc, char *argv[]) {
     switch (lexicalAnalysStatus) {
     case 0:
         std::cout << "[INFO] Done\n";
-        writeLexems(lexic.getLexems());
         syntaxAnalysStatus = syntax.analyze(lexic.getLexems());
         switch (syntaxAnalysStatus) {
         case 0:
@@ -76,37 +71,4 @@ int main(int argc, char *argv[]) {
         break;
     }
     return 0;
-}
-
-void writeLexems(const std::vector<k_13::Lexem> &lexems) {
-    k_13::constants_k13 constants;
-    std::filesystem::path outputFile = std::filesystem::current_path() / "allLexems.txt";
-    std::ofstream file(outputFile);
-    if(file.is_open()) {
-        file << "|----------------------------------------------------------------------------------------|\n";
-        file << "|                                     Lexems table                                       |\n";
-        file << "|----------------------------------------------------------------------------------------|\n";
-        file << "|   line number  |     lexem     |     value     |  lexem code  |     type of lexem      |\n";
-        file << "|----------------------------------------------------------------------------------------|\n";
-        for(auto lexem : lexems) {
-            file << "|\t" << lexem.line <<  findDistance(14, std::to_string(lexem.line)) << " |\t" << lexem.value << findDistance(10, lexem.value) << "\t |\t" << static_cast<std::underlying_type_t<k_13::LexemType>>(lexem.type) << " \t|\t" ;
-            for(auto &enumToString : constants.enumToStringLexems) {
-                if(lexem.type == enumToString.first) {
-                    file << enumToString.second << findDistance(18, enumToString.second) << " |\n";
-                    break;
-                }
-            }
-            file << "|----------------------------------------------------------------------------------------|\n";
-        }
-        file.close();
-    }
-}
-std::string findDistance(const int maxSize, const std::string &lexems) {
-    int length = maxSize - (lexems.length() - (lexems.length() % 8));
-    std::string distance = "";
-    int tabs = length / 8;
-    for(int i = 0; i < tabs; i++) {
-        distance += "\t";
-    }
-    return distance;
 }

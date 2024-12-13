@@ -28,14 +28,32 @@ int Processor::initMemory(const std::string &inpPath) {
 }
 
 void Processor::run() {
+    std::filesystem::path outputFile = std::filesystem::current_path() / "result.txt";
+    std::ofstream file(outputFile);
+    if(!file.is_open()) {
+        std::cerr << "[ERROR] Can't open file for writing" << std::endl;
+        return;
+    }
+
+    registerDevice->printRegisters();
+    registerDevice->printRegistersFile(file);
+
+    std::cout << std::endl;
+    file << std::endl;
+
+    memoryDevice->printMemory();
+    memoryDevice->printMemoryFile(file);
+
     bool halt = false;
+    int64_t temp = 0;
+    bool cFlag = false;
+    int64_t op1 = 0;
+    int64_t op2 = 0;
     while (!halt) {
         IR = memoryDevice->readMemory(PC);
-        int64_t temp = 0;
-        bool cFlag = false;
-        int64_t op1 = 0;
-        int64_t op2 = 0;
-        std::cout << "OPCODE = " << (IR >> 39) << std::endl;
+        std::cout << "\nPC = " << PC << " IR = " << IR << std::endl;
+        file << "\nPC = " << PC << " IR = " << IR << std::endl;
+
         switch (IR >> 39) {
         case 0:
             registerDevice->writeRegister(((IR >> 32) & 0x7F), memoryDevice->readMemory(IR & 0x1FFFFFF));
@@ -272,10 +290,16 @@ void Processor::run() {
         default:
             break;
         }
-        std::cout << "\nPC = " << PC << " IR = " << IR << std::endl;
+
         registerDevice->printRegisters();
+        registerDevice->printRegistersFile(file);
+
         std::cout << std::endl;
+        file << std::endl;
+
         memoryDevice->printMemory();
-        PC++;
+        memoryDevice->printMemoryFile(file);
+
+        (PC == 33554431) ? PC = 0 : PC++;
     }
 }
