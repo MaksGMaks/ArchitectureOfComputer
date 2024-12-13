@@ -24,6 +24,6 @@ end:    swp     r7      r1
         halt
 
 .data
-idn1:   10
+idn1:   -36028797018963978
 idn2:   10
 idn3:   11

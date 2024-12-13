@@ -44,4 +44,7 @@ private:
     void i0_type();
 
     bool match(const LexemType expectedType);
+
+    const int64_t LOW_NUM = (36028797018963968 * -1);
+    const int64_t HIGH_NUM = 36028797018963967;
 };};

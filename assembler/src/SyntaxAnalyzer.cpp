@@ -112,7 +112,11 @@ void k_13::SyntaxAnalyzer::data() {
     if(!match(LexemType::NUMBER)) {
         errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected number");
     } else {
-        idn.value = std::stoll(code[position - 1].value);
+        int64_t numData = std::stoll(code[position - 1].value);
+        if(numData > HIGH_NUM || numData < LOW_NUM) {
+            std::cout << "\tWarning! Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
+        }
+        idn.value = numData;
     }
     identifiers.push_back({name, idn});
     if(!match(LexemType::SEPARATOR)) {
@@ -135,7 +139,11 @@ void k_13::SyntaxAnalyzer::data() {
         if(!match(LexemType::NUMBER)) {
             errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected number");
         } else {
-            idn.value = std::stoll(code[position - 1].value);
+            int64_t numData = std::stoll(code[position - 1].value);
+            if(numData > HIGH_NUM || numData < LOW_NUM) {
+                std::cout << "\tWarning! Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
+            }
+            idn.value = numData;
         }
         identifiers.push_back({name, idn});
         if(!match(LexemType::SEPARATOR)) {
