@@ -1,5 +1,5 @@
 .code
-        lw      r1      idn1
+mult:   lw      r1      idn1
         lw      r2      iDn2 
         lw      r3      idn3
         lw      r4      idn4

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <list>
 #include <bitset>
 
 #include "constants.hpp"
@@ -14,7 +15,7 @@ public:
     Generator();
     ~Generator() = default;
 
-    int generate(const std::map<int, command> &commands_, const std::map<std::string, identifier> &identifiers_);
+    int generate(const std::map<int, command> &commands_, const std::list<std::pair<std::string, identifier>> &identifiers_);
     std::vector<std::bitset<56>> getBinaryCode() { return binaryCode; }
 private:
     bool identifierExist(const std::string &name);
@@ -25,7 +26,7 @@ private:
     int64_t r1_type(const int64_t &opcode, const int64_t &operand1);
 
     std::map<int, command> commands;
-    std::map<std::string, identifier> identifiers;
+    std::list<std::pair<std::string, identifier>> identifiers;
 
     std::vector<std::bitset<56>> binaryCode;
 };};

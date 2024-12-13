@@ -16,7 +16,7 @@ public:
 
     int analyze(const std::vector<Lexem> &lexems);
     std::map<int, command> getCommands() { return commands; }
-    std::map<std::string, identifier> getIdentifiers() { return identifiers; }
+    std::list<std::pair<std::string, identifier>> getIdentifiers() { return identifiers; }
 private:
     int errors = 0;
     int position = 0;
@@ -24,7 +24,7 @@ private:
 
     std::vector<Lexem> code;
     std::map<int, std::vector<std::string>> errorMessages;
-    std::map<std::string, identifier> identifiers;
+    std::list<std::pair<std::string, identifier>> identifiers;
 
     std::map<int, command> commands;
     command cmd;

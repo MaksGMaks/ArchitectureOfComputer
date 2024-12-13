@@ -4,7 +4,7 @@ k_13::Generator::Generator() {
     binaryCode.clear();
 }
 
-int k_13::Generator::generate(const std::map<int, command> &commands_, const std::map<std::string, identifier> &identifiers_) {
+int k_13::Generator::generate(const std::map<int, command> &commands_, const std::list<std::pair<std::string, identifier>> &identifiers_) {
     commands = commands_;
     identifiers = identifiers_;
     int64_t code = 0;
@@ -257,15 +257,17 @@ bool k_13::Generator::identifierExist(const std::string &name) {
 bool k_13::Generator::findOffset(int64_t &operand, const std::string &name) {
     try{
         operand = std::stoll(name);
+        return true;
     } catch (std::invalid_argument &e) {
-        if(identifierExist(name)) {
-            operand = identifiers.at(name).memLoc;
-        } else {
-            std::cerr << "Generator error: unknown identifier - " << name << std::endl;
-            return false;
+        for(auto &idn : identifiers) {
+            if(idn.first == name) {
+                operand = idn.second.memLoc;
+                return true;
+            }
         }
     }
-    return true;
+    std::cerr << "Generator error: unknown identifier - " << name << std::endl;
+    return false;   
 }
 
 int64_t k_13::Generator::r3_type(const int64_t &opcode, const int64_t &operand1, const int64_t &operand2, const int64_t &operand3) {
