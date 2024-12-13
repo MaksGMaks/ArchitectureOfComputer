@@ -202,28 +202,34 @@ void Processor::run() {
             break;
         case 22:
             temp = registerDevice->readRegister((IR >> 32) & 0x7F);
-            std::cout << "temp on start = " << temp << std::endl;
+            temp &= 0x00FFFFFFFFFFFFFF;
             for(int64_t i = 0; i < registerDevice->readRegister((IR >> 25) & 0x7F); i++) {
                 cFlag = (temp >> 56) & 0x1;
-                std::cout << "cFlag = " << cFlag << std::endl;
                 registerDevice->writeCFlag(cFlag);
                 temp <<= 1;
                 temp |= cFlag;
-                std::cout << "temp = " << temp << std::endl;
+            }
+            if(temp & 0x80000000000000) {
+                temp |= 0xFF00000000000000;
+            } else {
+                temp &= 0x007FFFFFFFFFFFFF;
             }
             registerDevice->writeRegister(IR & 0x7F, temp);
             break;
         case 23:
             temp = registerDevice->readRegister((IR >> 32) & 0x7F);
-            std::cout << "temp on start = " << temp << std::endl;
+            temp &= 0x00FFFFFFFFFFFFFF;
             for(int64_t i = 0; i < registerDevice->readRegister((IR >> 25) & 0x7F); i++) {
                 cFlag = temp & 0x1;
-                std::cout << "cFlag = " << cFlag << std::endl;
                 registerDevice->writeCFlag(cFlag);
                 temp >>= 1;
                 op1 = cFlag;
-                temp |= (op1 << 56);
-                std::cout << "temp = " << temp << std::endl;
+                temp |= (op1 << 55);
+            }
+            if(temp & 0x80000000000000) {
+                temp |= 0xFF00000000000000;
+            } else {
+                temp &= 0x007FFFFFFFFFFFFF;
             }
             registerDevice->writeRegister(IR & 0x7F, temp);
             break;

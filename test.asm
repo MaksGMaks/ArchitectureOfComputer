@@ -1,25 +1,29 @@
 .code
-mult:   lw      r1      idn1
-        lw      r2      iDn2 
+        lw      r1      idn1
+        lw      r2      idn2 
         lw      r3      idn3
-        lw      r4      idn4
-        bt      r3      r4
-        sal     r1      r4      r5
-        sar     r2      r4      r6
-        rcl     r1      r4      r7
-        rcr     r1      r4      r8
-        sw      r5      salRes
-        sw      r6      sarRes
-        sw      r7      rclRes
-        sw      r8      rcrRes
+        cmpe    r1      r2      r4
+        cmpe    r1      r3      r5
+        bez     r5      bezJM
+        inc     r6
+        inc     r6
+bezJM:  bnz     r4      bnezJM
+        dec     r6
+        dec     r6
+bnezJM: jma     r3      r1      jmaJM
+        inc     r6
+jmaJM:  jmb     r3      r1      jmbJM
+        inc     r6
+jmbJM:  jmae    r1      r1      jmaeJM
+        dec     r6
+jmaeJM: jmbe    r1      r3      jmbeJM
+        inc     r7
+jmbeJM: jmp     end
+        dec     r7
+end:    swp     r7      r1
         halt
 
 .data
-idn1:   15
-iDn2:   -10
-idn3:   5
-idn4:   2
-salRes: 0
-sarRes: 0
-rclRes: 0
-rcrRes: 0
+idn1:   10
+idn2:   10
+idn3:   11

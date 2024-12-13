@@ -213,10 +213,12 @@ void k_13::SyntaxAnalyzer::operators() {
             cmd = {LexemType::UNUSED, 0, 0, 0, ""};
             break;
         case LexemType::IDENTIFIER:
-            for(auto &idn : identifiers) {
-                if(idn.first == code[position].value) {
+            if(code[position-1].type == LexemType::COLOMN || code[position-1].type == LexemType::IDENTIFIER) {
+                errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected operand but get identifier. possible reason: misspelling");
+            }
+            for(auto &idn_ : identifiers) {
+                if(idn_.first == code[position].value) {
                     errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": label already exists");
-                    position++;
                     break;
                 }
             }
