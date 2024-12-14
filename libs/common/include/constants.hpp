@@ -78,10 +78,12 @@ namespace k_13 {
 
     struct command {
         LexemType opcode{};
+        bool offsetAccess{};
         int operand1{};
         int operand2{};
         int operand3{};
-        std::string offset{};
+        std::string offset1{};
+        std::string offset2{};
     };
 
     struct identifier {

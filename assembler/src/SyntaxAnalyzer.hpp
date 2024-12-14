@@ -35,6 +35,7 @@ private:
     void data();
 
     void r3_type();
+    void ro_type();
     void r2_type();
     void r1_type();
     void r0_type();

@@ -2,8 +2,8 @@
         lw      r1      idn1
         lw      r2      idn2 
         lw      r3      idn3
-        cmpe    r1      r2      r4
-        cmpe    r1      r3      r5
+        cmpe    r4      idn1    idn2
+        cmpe    r5      idn1    idn3
         bez     r5      bezJM
         inc     r6
         inc     r6

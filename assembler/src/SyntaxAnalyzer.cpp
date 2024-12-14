@@ -3,7 +3,7 @@
 k_13::SyntaxAnalyzer::SyntaxAnalyzer() {
     code.clear();
     errorMessages.clear();
-    cmd = {LexemType::UNUSED, 0, 0, 0, ""};
+    cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
     commands.clear();
 }
 
@@ -100,66 +100,64 @@ void k_13::SyntaxAnalyzer::data() {
     idn.isData = true;
     for(auto &idn : identifiers) {
         if(idn.first == name) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": identifier already exists");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": identifier already exists");
         }
     }
     if(!match(LexemType::IDENTIFIER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected identifier");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected identifier");
     }
     if(!match(LexemType::COLOMN)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected colomn");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected colomn");
     }
     if(!match(LexemType::NUMBER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected number");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected number");
     } else {
         int64_t numData = std::stoll(code[position - 1].value);
         if(numData > HIGH_NUM || numData < LOW_NUM) {
-            std::cout << "\tWarning! Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
+            std::cout << "\t[WARN] Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
         }
         idn.value = numData;
     }
     identifiers.push_back({name, idn});
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator");
     }
     while (code[position].type == LexemType::IDENTIFIER) {
         std::string name = code[position].value;
         idn.isData = true;
         for(auto &idn : identifiers) {
             if(idn.first == name) {
-                errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": identifier already exists");
+                errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": identifier already exists");
             }
         }
         if(!match(LexemType::IDENTIFIER)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected identifier");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected identifier");
         }
         if(!match(LexemType::COLOMN)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected colomn");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected colomn");
         }
         if(!match(LexemType::NUMBER)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected number");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected number");
         } else {
             int64_t numData = std::stoll(code[position - 1].value);
             if(numData > HIGH_NUM || numData < LOW_NUM) {
-                std::cout << "\tWarning! Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
+                std::cout << "\t[WARN] Number " + code[position - 1].value + " has more than 56-bits. Only first 56 bit will be writen, so expect loss of data" << std::endl;
             }
             idn.value = numData;
         }
         identifiers.push_back({name, idn});
         if(!match(LexemType::SEPARATOR)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator");
         }
     }
 }
 
 void k_13::SyntaxAnalyzer::operators() {
-    cmd = {LexemType::UNUSED, 0, 0, 0, ""};
+    cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
     while (code[position].type != LexemType::DATA && position < code.size()) {
         switch (code[position].type) {
         case LexemType::ADD:
         case LexemType::SUB:
-        case LexemType::XADD:
-        case LexemType::XSUB:
         case LexemType::MULT:
         case LexemType::IMULT:
         case LexemType::AND:
@@ -168,6 +166,12 @@ void k_13::SyntaxAnalyzer::operators() {
         case LexemType::SAL:
         case LexemType::SAR:
         case LexemType::CMPEQ:
+            cmd.opcode = code[position].type;
+            position++;
+            ro_type();
+            break;
+        case LexemType::XADD:
+        case LexemType::XSUB:
         case LexemType::ADB:
         case LexemType::SBB:
         case LexemType::RCL:
@@ -218,15 +222,15 @@ void k_13::SyntaxAnalyzer::operators() {
             break;
         case LexemType::SEPARATOR:
             position++;
-            cmd = {LexemType::UNUSED, 0, 0, 0, ""};
+            cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
             break;
         case LexemType::IDENTIFIER:
             if(code[position-1].type == LexemType::COLOMN || code[position-1].type == LexemType::IDENTIFIER) {
-                errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected operand but get identifier. possible reason: misspelling");
+                errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected operand but get identifier. possible reason: misspelling");
             }
             for(auto &idn_ : identifiers) {
                 if(idn_.first == code[position].value) {
-                    errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": label already exists");
+                    errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": label already exists");
                     break;
                 }
             }
@@ -235,15 +239,15 @@ void k_13::SyntaxAnalyzer::operators() {
             identifiers.push_back({code[position].value, idn});
             position++;
             if(!match(LexemType::COLOMN)) {
-                errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected colomn after label");
+                errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected colomn after label");
             }
             break;
         case LexemType::UNKNOWN:
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": unknown statement - " + code[position].value);
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": unknown statement - " + code[position].value);
             position++;
             break;
         default:
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": unknown statement - " + code[position].value);
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": unknown statement - " + code[position].value);
             position++;
             break;
         }
@@ -252,55 +256,55 @@ void k_13::SyntaxAnalyzer::operators() {
 
 void k_13::SyntaxAnalyzer::r3_type() {
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
     } else {
         cmd.operand1 = std::stoll(code[position-1].value);
     }
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
     } else {
         cmd.operand2 = std::stoll(code[position-1].value);
     }
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
     } else {
         cmd.operand3 = std::stoll(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
 
 void k_13::SyntaxAnalyzer::r2_type() {
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
     } else {
         cmd.operand1 = std::stoll(code[position-1].value);
     }
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
     } else {
         cmd.operand2 = std::stoll(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
 
 void k_13::SyntaxAnalyzer::r1_type() {
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register destReg. Current value - " + code[position].value);
     } else {
         cmd.operand1 = std::stoll(code[position-1].value);
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
 
@@ -308,69 +312,110 @@ void k_13::SyntaxAnalyzer::r0_type() {
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
 
 void k_13::SyntaxAnalyzer::i2_type() {
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rA. Current value - " + code[position].value);
     } else {
         cmd.operand1 = std::stoll(code[position-1].value);
     }
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rB. Current value - " + code[position].value);
     } else {
         cmd.operand2 = std::stoll(code[position-1].value);
     }
-    cmd.offset = code[position].value;
+    cmd.offset2 = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected label/offset. Current value - " + code[position].value);
-        } else if(std::stoll(code[position - 1].value) < 0 || std::stoll(code[position - 1].value) > 33554431) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": offset out of range. Current value - " + code[position].value);
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected label/offset. Current value - " + code[position].value);
         }
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
 
 void k_13::SyntaxAnalyzer::i1_type() {
     if(!match(LexemType::REGISTER)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected register rA");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register rA");
     } else {
         cmd.operand1 = std::stoll(code[position-1].value);
     }
-    cmd.offset = code[position].value;
+    cmd.offset2 = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected label/offset");
-        } else if(std::stoll(code[position - 1].value) < 0 || std::stoll(code[position - 1].value) > 33554431) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": offset out of range");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected label/offset. Current value - " + code[position].value);
         }
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator");
     }
 }
 
 void k_13::SyntaxAnalyzer::i0_type() {
-    cmd.offset = code[position].value;
+    cmd.offset2 = code[position].value;
     if(!match(LexemType::IDENTIFIER)) {
         if(!match(LexemType::NUMBER)) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected label/offset");
-        } else if(std::stoll(code[position - 1].value) < 0 || std::stoll(code[position - 1].value) > 33554431) {
-            errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": offset out of range");
+            errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected label/offset. Current value - " + code[position].value);
         }
     }
     commands.insert({memLoc, cmd});
     memLoc++;
     if(!match(LexemType::SEPARATOR)) {
-        errorMessages[position].push_back("\tSyntax error at line " + std::to_string(code[position].line) + ": expected separator");
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator");
+    }
+}
+
+void k_13::SyntaxAnalyzer::ro_type() {
+    if(!match(LexemType::REGISTER)) {
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected destReg. Current value - " + code[position].value);
+    } else {
+        cmd.operand1 = std::stoll(code[position-1].value);
+    }
+    switch (code[position].type) {
+    case LexemType::REGISTER:
+        cmd.operand2 = std::stoll(code[position].value);
+        cmd.offsetAccess = false;
+        break;
+    case LexemType::NUMBER:
+        cmd.offset1 = code[position].value;
+        cmd.offsetAccess = true;
+        break;
+    case LexemType::IDENTIFIER:
+        cmd.offset1 = code[position].value;
+        cmd.offsetAccess = true;
+        break;
+    default:
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register or offset. Current value - " + code[position].value);
+    }
+    position++;
+    switch (code[position].type) {
+    case LexemType::REGISTER:
+        cmd.operand3 = std::stoll(code[position].value);
+        cmd.offsetAccess = false;
+        break;
+    case LexemType::NUMBER:
+        cmd.offset2 = code[position].value;
+        cmd.offsetAccess = true;
+        break;
+    case LexemType::IDENTIFIER:
+        cmd.offset2 = code[position].value;
+        cmd.offsetAccess = true;
+        break;
+    default:
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register or offset. Current value - " + code[position].value);
+    }
+    position++;
+    commands.insert({memLoc, cmd});
+    memLoc++;
+    if(!match(LexemType::SEPARATOR)) {
+        errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected separator. Current value - " + code[position].value);
     }
 }
