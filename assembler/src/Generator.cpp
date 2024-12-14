@@ -54,33 +54,41 @@ int k_13::Generator::generate(const std::map<int, command> &commands_, const std
             break;
         case LexemType::ADD:
             opcode = 4LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::SUB:
             opcode = 5LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
@@ -98,33 +106,41 @@ int k_13::Generator::generate(const std::map<int, command> &commands_, const std
             break;
         case LexemType::MULT:
             opcode = 8LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::IMULT:
             opcode = 9LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
@@ -142,49 +158,61 @@ int k_13::Generator::generate(const std::map<int, command> &commands_, const std
             break;
         case LexemType::AND:
             opcode = 12LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::OR:
             opcode = 13LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::XOR:
             opcode = 14LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
@@ -196,49 +224,61 @@ int k_13::Generator::generate(const std::map<int, command> &commands_, const std
             break;
         case LexemType::SAL:
             opcode = 16LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::SAR:
             opcode = 17LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;
         case LexemType::CMPEQ:
             opcode = 18LL << 51;
-            if(com.second.offsetAccess) {
+            if(com.second.offsetAccess1) {
                 if(!findOffset(offset1, com.second.offset1, PC))
                     return -1;
+                offset1 |= (1<<21);
+            } else {
+                offset1 = com.second.operand2;
+            }
+            if(com.second.offsetAccess2) {
                 if(!findOffset(offset2, com.second.offset2, PC))
                     return -1;
-                offset1 |= (1<<21);
                 offset2 |= (1<<21);
-                code = r3_type(opcode, com.second.operand1, offset1, offset2);
             } else {
-                code = r3_type(opcode, com.second.operand1, com.second.operand2, com.second.operand3);
+                offset2 = com.second.operand3;
             }
+            code = r3_type(opcode, com.second.operand1, offset1, offset2);
             bs = std::bitset<56>(code);
             binaryCode.push_back(bs);
             break;

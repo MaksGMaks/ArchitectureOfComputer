@@ -78,7 +78,8 @@ namespace k_13 {
 
     struct command {
         LexemType opcode{};
-        bool offsetAccess{};
+        bool offsetAccess1{};
+        bool offsetAccess2{};
         int operand1{};
         int operand2{};
         int operand3{};
@@ -124,7 +125,7 @@ namespace k_13 {
             {"rcr", LexemType::RCR},
 
             {"bez", LexemType::BEZ},
-            {"bnz", LexemType::BNZ},
+            {"bnez", LexemType::BNZ},
             {"jma", LexemType::JMA},
             {"jmb", LexemType::JMB},
             {"jmae", LexemType::JMAE},

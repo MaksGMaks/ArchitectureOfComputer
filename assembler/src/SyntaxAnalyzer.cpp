@@ -3,7 +3,7 @@
 k_13::SyntaxAnalyzer::SyntaxAnalyzer() {
     code.clear();
     errorMessages.clear();
-    cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
+    cmd = {LexemType::UNUSED, false, false, 0, 0, 0, "", ""};
     commands.clear();
 }
 
@@ -153,7 +153,7 @@ void k_13::SyntaxAnalyzer::data() {
 }
 
 void k_13::SyntaxAnalyzer::operators() {
-    cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
+    cmd = {LexemType::UNUSED, false, false, 0, 0, 0, "", ""};
     while (code[position].type != LexemType::DATA && position < code.size()) {
         switch (code[position].type) {
         case LexemType::ADD:
@@ -222,7 +222,7 @@ void k_13::SyntaxAnalyzer::operators() {
             break;
         case LexemType::SEPARATOR:
             position++;
-            cmd = {LexemType::UNUSED, false, 0, 0, 0, "", ""};
+            cmd = {LexemType::UNUSED, false, false, 0, 0, 0, "", ""};
             break;
         case LexemType::IDENTIFIER:
             if(code[position-1].type == LexemType::COLOMN || code[position-1].type == LexemType::IDENTIFIER) {
@@ -382,15 +382,15 @@ void k_13::SyntaxAnalyzer::ro_type() {
     switch (code[position].type) {
     case LexemType::REGISTER:
         cmd.operand2 = std::stoll(code[position].value);
-        cmd.offsetAccess = false;
+        cmd.offsetAccess1 = false;
         break;
     case LexemType::NUMBER:
         cmd.offset1 = code[position].value;
-        cmd.offsetAccess = true;
+        cmd.offsetAccess1 = true;
         break;
     case LexemType::IDENTIFIER:
         cmd.offset1 = code[position].value;
-        cmd.offsetAccess = true;
+        cmd.offsetAccess1 = true;
         break;
     default:
         errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register or offset. Current value - " + code[position].value);
@@ -399,15 +399,15 @@ void k_13::SyntaxAnalyzer::ro_type() {
     switch (code[position].type) {
     case LexemType::REGISTER:
         cmd.operand3 = std::stoll(code[position].value);
-        cmd.offsetAccess = false;
+        cmd.offsetAccess2 = false;
         break;
     case LexemType::NUMBER:
         cmd.offset2 = code[position].value;
-        cmd.offsetAccess = true;
+        cmd.offsetAccess2 = true;
         break;
     case LexemType::IDENTIFIER:
         cmd.offset2 = code[position].value;
-        cmd.offsetAccess = true;
+        cmd.offsetAccess2 = true;
         break;
     default:
         errorMessages[position].push_back("\t[SYN_ERROR] - " + std::to_string(code[position].line) + ": expected register or offset. Current value - " + code[position].value);

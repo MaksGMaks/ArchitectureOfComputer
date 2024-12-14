@@ -2,12 +2,12 @@
         lw      r1      idn1
         lw      r2      idn2 
         lw      r3      idn3
-        cmpe    r4      idn1    idn2
-        cmpe    r5      idn1    idn3
+        cmpe    r4      idn1    r2
+        cmpe    r5      r1      idn3
         bez     r5      bezJM
         inc     r6
         inc     r6
-bezJM:  bnz     r4      bnezJM
+bezJM:  bnez    r4      bnezJM
         dec     r6
         dec     r6
 bnezJM: jma     r3      r1      jmaJM
@@ -24,6 +24,6 @@ end:    swp     r7      r1
         halt
 
 .data
-idn1:   -36028797018963978
+idn1:   10
 idn2:   10
 idn3:   11
