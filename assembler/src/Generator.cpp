@@ -11,6 +11,13 @@ int k_13::Generator::generate(const std::map<int, command> &commands_, const std
     int64_t opcode = 0;
     int64_t offset = 0;
     std::bitset<56> bs;
+    int progSize = commands.size();
+    for(auto &idn : identifiers) {
+        if(idn.second.isData) {
+            idn.second.memLoc = progSize;
+            progSize++;
+        }
+    }
     for(auto &com : commands) {
         switch (com.second.opcode) {
         case LexemType::LOAD:
@@ -266,7 +273,7 @@ bool k_13::Generator::findOffset(int64_t &operand, const std::string &name) {
             }
         }
     }
-    std::cerr << "Generator error: unknown identifier - " << name << std::endl;
+    std::cerr << "\t[GEN_ERROR] unknown identifier - " << name << std::endl;
     return false;   
 }
 

@@ -83,7 +83,7 @@ void Processor::run() {
             break;
         case 5:
             temp = (registerDevice->readRegister((IR >> 32) & 0x7F) - registerDevice->readRegister((IR >> 25) & 0x7F));
-            if(temp < 0xFF80000000000000) {
+            if(temp < -36028797018963968) {
                 temp |= 0x0080000000000000;
                 cFlag = true;
                 registerDevice->writeCFlag(cFlag);
@@ -110,7 +110,7 @@ void Processor::run() {
             break;
         case 7:
             temp = (registerDevice->readRegister((IR >> 32) & 0x7F) - registerDevice->readRegister((IR >> 25) & 0x7F));
-            if(temp < 0xFF80000000000000) {
+            if(temp < -36028797018963968) {
                 temp |= 0x0080000000000000;
                 cFlag = true;
                 registerDevice->writeCFlag(cFlag);
@@ -140,7 +140,7 @@ void Processor::run() {
                 temp &= 0x007FFFFFFFFFFFFF;
                 cFlag = true;
                 registerDevice->writeCFlag(cFlag);
-            } else if(temp < 0xFF80000000000000) {
+            } else if(temp < -36028797018963968) {
                 temp |= 0x0080000000000000;
                 cFlag = true;
                 registerDevice->writeCFlag(cFlag);
@@ -164,7 +164,7 @@ void Processor::run() {
             break;
         case 11:
             temp = (registerDevice->readRegister((IR >> 32) & 0x7F) - 1);
-            if(temp < 0xFF80000000000000) {
+            if(temp < -36028797018963968) {
                 temp |= 0x0080000000000000;
                 cFlag = true;
                 registerDevice->writeCFlag(cFlag);
@@ -185,7 +185,7 @@ void Processor::run() {
             registerDevice->writeRegister((IR & 0x7F), (registerDevice->readRegister((IR >> 32) & 0x7F) ^ registerDevice->readRegister((IR >> 25) & 0x7F)));
             break;
         case 15:
-            registerDevice->writeRegister((IR & 0x7F), ~(registerDevice->readRegister((IR >> 32) & 0x7F)));
+            registerDevice->writeRegister(((IR >> 25) & 0x7F), ~(registerDevice->readRegister((IR >> 32) & 0x7F)));
             break;
         case 16:
             temp = (registerDevice->readRegister((IR >> 32) & 0x7F) << (registerDevice->readRegister((IR >> 25) & 0x7F) - 1));
@@ -221,11 +221,17 @@ void Processor::run() {
         case 22:
             temp = registerDevice->readRegister((IR >> 32) & 0x7F);
             temp &= 0x00FFFFFFFFFFFFFF;
-            for(int64_t i = 0; i < registerDevice->readRegister((IR >> 25) & 0x7F); i++) {
-                cFlag = (temp >> 56) & 0x1;
+            op1 = registerDevice->readRegister((IR >> 25) & 0x7F);
+            op2 = op1 % 56;
+            for(int64_t i = 0; i < op2; i++) {
+                cFlag = (temp & 0x0080000000000000) != 0;
                 registerDevice->writeCFlag(cFlag);
                 temp <<= 1;
                 temp |= cFlag;
+            }
+            if(op1 != 0) {
+                cFlag = (temp & 0x1) != 0; 
+                registerDevice->writeCFlag(cFlag);
             }
             if(temp & 0x80000000000000) {
                 temp |= 0xFF00000000000000;
@@ -237,12 +243,18 @@ void Processor::run() {
         case 23:
             temp = registerDevice->readRegister((IR >> 32) & 0x7F);
             temp &= 0x00FFFFFFFFFFFFFF;
-            for(int64_t i = 0; i < registerDevice->readRegister((IR >> 25) & 0x7F); i++) {
+            op1 = registerDevice->readRegister((IR >> 25) & 0x7F);
+            op2 = op1 % 56;
+            for(int64_t i = 0; i < op2; i++) {
                 cFlag = temp & 0x1;
                 registerDevice->writeCFlag(cFlag);
                 temp >>= 1;
                 op1 = cFlag;
                 temp |= (op1 << 55);
+            }
+            if(op1 != 0) {
+                cFlag = (temp & 0x0080000000000000) != 0;
+                registerDevice->writeCFlag(cFlag);
             }
             if(temp & 0x80000000000000) {
                 temp |= 0xFF00000000000000;
