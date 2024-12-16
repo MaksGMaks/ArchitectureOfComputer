@@ -63,8 +63,10 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
             break;
 
         case State::END_OF_FILE:
+            token = std::make_pair(std::make_pair("\n", line), LexemType::SEPARATOR);
             {
                 std::unique_lock<std::mutex> lock(mtx);
+                inputLexems.push(token);
                 isEndOfFile = true;
                 getToken.notify_one();
             }
@@ -182,6 +184,12 @@ int k_13::LexicalAnalyzer::readFromFile(const std::string &filename) {
                 state = State::END_OF_FILE;
                 break;
             }
+            token = std::make_pair(std::make_pair("\n", line), LexemType::SEPARATOR);
+            {
+                std::unique_lock<std::mutex> lock(mtx);
+                inputLexems.push(token);
+                getToken.notify_one();
+            }
             line++;
             file.get(ch);
             state = State::FINISH;
@@ -238,7 +246,7 @@ void k_13::LexicalAnalyzer::checkLexem(int tokenLine, std::string token) {
             return;
         }
     }
-    if(token.size() > 4 && token.size() < 12) {
+    if(token.size() > 4 && token.size() < 13) {
         lexems.push_back({LexemType::IDENTIFIER, token, tokenLine});
         return;
     }
