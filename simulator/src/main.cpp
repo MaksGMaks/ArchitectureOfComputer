@@ -17,8 +17,6 @@ int main(int argc, char *argv[]) {
 
     std::string inpPath = argv[1];
 
-    std::unique_ptr<MemoryDevice> memoryDevice = std::make_unique<MemoryDevice>();
-
     std::cout << "[INFO] Start reading file" << std::endl;
     
     Processor processor;
