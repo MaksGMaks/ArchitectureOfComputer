@@ -1,4 +1,4 @@
 .vscode/*
 build/*
-/*.asm
-/*.mc
+./*.asm
+./*.mc

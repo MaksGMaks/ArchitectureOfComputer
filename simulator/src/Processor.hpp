@@ -22,10 +22,4 @@ private:
 
     int PC;
     int64_t IR;
-    
-    char findRegister1(const int64_t &operand);
-    char findRegister2(const int64_t &operand);
-    char findRegister3(const int64_t &operand);
-    int findOffset(const int64_t &operand);
-
 };
